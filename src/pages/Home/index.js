@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { AppContext } from '../..'
 import SearchTop from './SearchTop'
 import CurrencySwitcher from './CurrencySwitcher'
@@ -9,11 +9,8 @@ const HotelList = observer(() => {
 
   const hotels = hotelStore.searchResults
 
-  useEffect(() => {
-    hotelStore.load()
-  }, [hotelStore])
   if (hotels.NO_RESULT) {
-    return null
+    return <div className="text-center">{hotels.NO_RESULT}</div>
   }
   return (
     <div className="container">
