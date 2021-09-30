@@ -60,6 +60,19 @@ export class Hotel {
     return rs
   }
 
+  get lsCompetitorAndUs() {
+    const ourOffer = {
+      key: 'Us',
+      rate: this.price,
+      rateWithCurrency: this.priceWithCurrency,
+    }
+
+    const sorted = [...this.lsCompetitor, ourOffer].sort((a, b) => {
+      return b.rate - a.rate
+    })
+    return sorted
+  }
+
   get isGivenCompetitorRates() {
     if (!this.lsCompetitor.length) return false
     const foundIssue = this.lsCompetitor.find((o) => !o.rate)
@@ -80,6 +93,24 @@ export class Hotel {
       this.price,
       this.store.selectedCurrency
     )
+  }
+
+  get savingMessageIfExist() {
+    // Where applicable, you should display a "Save X%" message in the result to highlight how much the user saves booking with us if there's a more expensive competition available
+
+    // Where applicable, also show in each result a strikethrough rate of the most expensive competitor price to emphasise expensive rates out there (to encourage them to pick us)
+
+    try {
+      const mostExpensive = this.lsCompetitorAndUs[0]
+      const savingMoney = mostExpensive.rate - this.price
+      const savingRatio = Math.round((savingMoney / mostExpensive.rate) * 100)
+      return {
+        msg: `${savingRatio}%`,
+        mostExpensiveRate: mostExpensive.rateWithCurrency,
+      }
+    } catch (error) {
+      return undefined
+    }
   }
 
   // mapping server data to client data

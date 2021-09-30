@@ -28,7 +28,7 @@ const HotelList = observer(() => {
 })
 const HotelListItem = ({ hotel }) => {
   const objHotel = hotel
-  const { lsCompetitor } = objHotel
+  const { lsCompetitorAndUs: lsCompetitor } = objHotel
   const Competitors = () => {
     return lsCompetitor.map((o) => (
       <b className="d-inline-block p-2" key={o.key}>
@@ -36,6 +36,14 @@ const HotelListItem = ({ hotel }) => {
         <div>{o.rateWithCurrency}</div>
       </b>
     ))
+  }
+  const SavingDisplay = () => {
+    const { mostExpensiveRate, msg } = objHotel.savingMessageIfExist
+    return (
+      <>
+        ( <strike>{mostExpensiveRate}</strike> {msg})
+      </>
+    )
   }
   return (
     <>
@@ -46,7 +54,9 @@ const HotelListItem = ({ hotel }) => {
         />
         <div className="card-body">
           <div className="fw-bold">{objHotel.name}</div>
-          <div>Price: {objHotel.priceWithCurrency}</div>
+          <div>
+            Price: {objHotel.priceWithCurrency} <SavingDisplay />
+          </div>
           <div>
             Stars: {objHotel.stars} - Rating: {objHotel.rating}
           </div>
