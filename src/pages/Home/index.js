@@ -38,6 +38,7 @@ const HotelListItem = ({ hotel }) => {
     ))
   }
   const SavingDisplay = () => {
+    if (!objHotel.savingMessageIfExist) return null
     const { mostExpensiveRate, msg } = objHotel.savingMessageIfExist
     return (
       <>
@@ -45,6 +46,36 @@ const HotelListItem = ({ hotel }) => {
       </>
     )
   }
+
+  const TaxesAndFees = () => {
+    if (!objHotel.taxesAndFeesWithCurrency) return null
+
+    const { tax, hotelFees } = objHotel.taxesAndFeesWithCurrency
+    return (
+      <b className="taxAndFeeWrapper">
+        (?)
+        <b className="taxAndFee">
+          <br /> Inclued: <br /> Tax: {tax} - Fees: {hotelFees}{' '}
+        </b>
+        <style>
+          {`
+          .taxAndFee{display:none}
+          .taxAndFeeWrapper{cursor:pointer}
+          .taxAndFeeWrapper:hover  .taxAndFee{display:block}
+          `}
+        </style>
+      </b>
+    )
+  }
+
+  const Price = () => {
+    return (
+      <div>
+        Price: {objHotel.priceWithCurrency} <TaxesAndFees />
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="card shadow-sm">
@@ -54,12 +85,13 @@ const HotelListItem = ({ hotel }) => {
         />
         <div className="card-body">
           <div className="fw-bold">{objHotel.name}</div>
-          <div>
-            Price: {objHotel.priceWithCurrency} <SavingDisplay />
-          </div>
+
           <div>
             Stars: {objHotel.stars} - Rating: {objHotel.rating}
           </div>
+          <SavingDisplay />
+          <Price />
+
           <hr />
           <div>{objHotel.address}</div>
           <div>

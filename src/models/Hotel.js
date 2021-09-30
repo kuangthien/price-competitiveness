@@ -67,8 +67,9 @@ export class Hotel {
       rateWithCurrency: this.priceWithCurrency,
     }
 
+    // When there's competitor pricing, we should show in the competitor pricing list our rates and where we stand in the ordering of cheapest to most expensive
     const sorted = [...this.lsCompetitor, ourOffer].sort((a, b) => {
-      return b.rate - a.rate
+      return a.rate - b.rate
     })
     return sorted
   }
@@ -96,12 +97,20 @@ export class Hotel {
   }
 
   get savingMessageIfExist() {
-    // Where applicable, you should display a "Save X%" message in the result to highlight how much the user saves booking with us if there's a more expensive competition available
-
-    // Where applicable, also show in each result a strikethrough rate of the most expensive competitor price to emphasise expensive rates out there (to encourage them to pick us)
-
     try {
-      const mostExpensive = this.lsCompetitorAndUs[0]
+      // When no competitor rates are given, do not show anything or savings (since there's no basis for comparison)
+
+      if (!this.isGivenCompetitorRates) return undefined
+
+      const mostExpensive = this.lsCompetitorAndUs.reverse()[0]
+
+      // When all competitor rates are cheaper than us, there's no savings
+      if (mostExpensive.key === 'Us') return undefined
+
+      // When 1 or more competitor rates are more expensive than us, we should show our savings over the competitor's rates
+      // Where applicable, you should display a "Save X%" message in the result to highlight how much the user saves booking with us if there's a more expensive competition available
+      // Where applicable, also show in each result a strikethrough rate of the most expensive competitor price to emphasise expensive rates out there (to encourage them to pick us)
+
       const savingMoney = mostExpensive.rate - this.price
       const savingRatio = Math.round((savingMoney / mostExpensive.rate) * 100)
       return {
@@ -111,6 +120,22 @@ export class Hotel {
     } catch (error) {
       return undefined
     }
+  }
+
+  get taxesAndFeesWithCurrency() {
+    // When taxes & fees are given, that means the price given is already tax inclusive, highlight this in the UI for the results
+
+    const { tax, hotelFees } = this.taxesAndFees
+    if (!(tax && hotelFees)) return undefined
+
+    const convert = Utils.getRoundedPriceWithCurrency
+    const taxConverted = convert(tax, this.store.selectedCurrency)
+    const hotelFeesConverted = convert(hotelFees, this.store.selectedCurrency)
+    const rs = {
+      tax: taxConverted,
+      hotelFees: hotelFeesConverted,
+    }
+    return rs
   }
 
   // mapping server data to client data
@@ -125,7 +150,9 @@ export class Hotel {
       description,
       price,
       competitors,
+      taxes_and_fees = {},
     } = json
+
     this.serverId = serverId
     this.name = name
     this.rating = rating
@@ -135,5 +162,9 @@ export class Hotel {
     this.description = description
     this.price = price
     this.competitors = competitors || []
+    this.taxesAndFees = {
+      tax: taxes_and_fees.tax,
+      hotelFees: taxes_and_fees.hotel_fees,
+    }
   }
 }

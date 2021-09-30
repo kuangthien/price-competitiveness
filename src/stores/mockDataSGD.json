@@ -69,6 +69,10 @@
             "Traveloka": 300123.22,
             "Expedia": 163
         },
+        "taxes_and_fees": {
+            "tax": 13.12,
+            "hotel_fees": 16.40
+        },
         "name": "Has details has price",
         "rating": 7.7,
         "price": 300123.22,
