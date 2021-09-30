@@ -4,11 +4,16 @@ import mock1 from './mockData.json'
 export class HotelStore {
   hotels = []
   selectedCurrency = 'USD'
+  currenyBulk = ['USD', 'SGD', 'CNY', 'KRW', 'JPY', 'IDR']
 
   constructor(transportLayer, authorStore) {
     makeAutoObservable(this)
   }
 
+  updateSelectedCurrency(value) {
+    this.selectedCurrency = value
+  }
+  
   get searchResults() {
     if (!this.hotels.length)
       return {

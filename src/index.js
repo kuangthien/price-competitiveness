@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals'
 import { HotelStore } from './stores/HotelStore'
 
 export const AppContext = createContext({
-  hotelStore: new HotelStore(),
+  hotelStore: undefined, // shoud setup Typescript?
 })
 
 ReactDOM.render(
