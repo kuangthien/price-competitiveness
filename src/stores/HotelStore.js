@@ -5,6 +5,7 @@ import mock2 from './mockDataSGD.json'
 
 export class HotelStore {
   hotels = null
+  searchKeyword = null
   selectedCurrency = 'USD'
   currenyBulk = ['USD', 'SGD', 'CNY', 'KRW', 'JPY', 'IDR']
 
@@ -13,8 +14,9 @@ export class HotelStore {
   }
 
   updateSelectedCurrency(value) {
-    console.log('updateSelectedCurrency ' + value)
+    // A/C: When you switch, a new API call is made for that currency to re-render results. New currency should now be persisted as the user's default choice
     this.selectedCurrency = value
+    this.load(this.searchKeyword)
   }
 
   get searchResults() {
@@ -36,7 +38,6 @@ export class HotelStore {
   }
 
   async load(keyword) {
-    console.log('load ' + keyword)
     // const uri = 'https://5df9cc6ce9f79e0014b6b3dc.mockapi.io/hotels/tokyo'
     // const fetchedData = await axios.get(uri)
 
@@ -45,7 +46,10 @@ export class HotelStore {
 
     const mockData = { USD: mock1, SGD: mock2 }
     const fetchedData = mockData[this.selectedCurrency] || []
+    console.log('load ' + keyword + ' cur ' + this.selectedCurrency)
+
     runInAction(() => {
+      this.searchKeyword = keyword
       this.hotels = []
       fetchedData.forEach((json) => this.updateTodoFromServer(json))
     })
