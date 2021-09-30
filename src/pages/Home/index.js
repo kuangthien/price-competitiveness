@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react'
 import { useContext, useEffect } from 'react'
-import { AppContext } from '..'
+import { AppContext } from '../..'
 
 const SearchTop = () => {
   return (
