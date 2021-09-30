@@ -24,17 +24,27 @@ export class HotelStore {
       return {
         NO_RESULT: 'Please search',
       }
-    } else if (!this.hotels.length) {
-      return {
-        NO_RESULT: 'No result to display',
-      }
     }
     // A/C:
     // If the hotel details exist but not the prices, push that result to the bottom of the list
     // If the hotel details do not exist, but prices do, do not display that hotel
-    return this.hotels
-      .filter((o) => true && !(!o.isExistedDetails && o.price))
+
+    // A/C:
+    // When no competitor rates are given, do not show anything or savings (since there's no basis for comparison)
+    const resultsWithData = this.hotels
+      .filter((o) => {
+        return (
+          true && !(!o.isExistedDetails && o.price) && o.isGivenCompetitorRates
+        )
+      })
       .sort((_a, b) => (!b.price ? -1 : 1))
+      
+    if (!resultsWithData.length) {
+      return {
+        NO_RESULT: 'No result to display',
+      }
+    }
+    return resultsWithData
   }
 
   async load(keyword) {

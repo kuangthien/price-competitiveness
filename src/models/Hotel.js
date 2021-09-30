@@ -1,6 +1,27 @@
 import { makeAutoObservable } from 'mobx'
 import { nanoid } from 'nanoid'
 
+const Utils = {
+  getRoundedPriceWithCurrency: (originalPrice, currency) => {
+    // A/C:
+    // Hotel prices in the results page are typically rounded
+    // Currencies like USD, SGD, CNY are rounded to their nearest dollar. E.g. USD 100.21 is displayed as USD 100
+    // Currencies like KRW, JPY, IDR are rounded to their nearest 100-dollars. E.g. KRW 300123.22 is displayed as KRW 300,100
+    let rounded
+    const selectedCurrency = currency
+
+    if (['USD', 'SGD', 'CNY'].includes(selectedCurrency)) {
+      rounded = Math.round(originalPrice * 1) / 1
+    } else if (['KRW', 'JPY', 'IDR'].includes(selectedCurrency)) {
+      rounded = Math.round(originalPrice * 0.01) / 0.01
+    } else {
+      rounded = originalPrice
+    }
+
+    const formatted = new Intl.NumberFormat(undefined).format(rounded)
+    return `${selectedCurrency} ${formatted}`
+  },
+}
 export class Hotel {
   id = null
   store = null
@@ -24,6 +45,27 @@ export class Hotel {
   get isExistedDetails() {
     return this.id && this.name && this.address // => assumption
   }
+  get lsCompetitor() {
+    // transform obj => arr
+
+    const rs = Object.keys(this.competitors).map((key) => ({
+      key,
+      rate: this.competitors[key],
+      rateWithCurrency: Utils.getRoundedPriceWithCurrency(
+        this.competitors[key],
+        this.store.selectedCurrency
+      ),
+    }))
+
+    return rs
+  }
+
+  get isGivenCompetitorRates() {
+    if (!this.lsCompetitor.length) return false
+    const foundIssue = this.lsCompetitor.find((o) => !o.rate)
+    return !foundIssue
+  }
+
   get priceWithCurrency() {
     // A/C:
     // When I do not have prices returned for the currency, that means the rates are unavailable for that hotel
@@ -34,23 +76,10 @@ export class Hotel {
       return 'Rates unavailable'
     }
 
-    // A/C:
-    // Hotel prices in the results page are typically rounded
-    // Currencies like USD, SGD, CNY are rounded to their nearest dollar. E.g. USD 100.21 is displayed as USD 100
-    // Currencies like KRW, JPY, IDR are rounded to their nearest 100-dollars. E.g. KRW 300123.22 is displayed as KRW 300,100
-    let rounded
-    const selectedCurrency = this.store.selectedCurrency
-
-    if (['USD', 'SGD', 'CNY'].includes(selectedCurrency)) {
-      rounded = Math.round(this.price * 1) / 1
-    } else if (['KRW', 'JPY', 'IDR'].includes(selectedCurrency)) {
-      rounded = Math.round(this.price * 0.01) / 0.01
-    } else {
-      rounded = this.price
-    }
-
-    const formatted = new Intl.NumberFormat(undefined).format(rounded)
-    return `${selectedCurrency} -  ${formatted}`
+    return Utils.getRoundedPriceWithCurrency(
+      this.price,
+      this.store.selectedCurrency
+    )
   }
 
   // mapping server data to client data
@@ -64,6 +93,7 @@ export class Hotel {
       photo,
       description,
       price,
+      competitors,
     } = json
     this.serverId = serverId
     this.name = name
@@ -73,5 +103,6 @@ export class Hotel {
     this.photo = photo
     this.description = description
     this.price = price
+    this.competitors = competitors || []
   }
 }

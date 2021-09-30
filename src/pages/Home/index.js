@@ -28,13 +28,12 @@ const HotelList = observer(() => {
 })
 const HotelListItem = ({ hotel }) => {
   const objHotel = hotel
-  const { competitors } = objHotel
+  const { lsCompetitor } = objHotel
   const Competitors = () => {
-    if (!competitors) return null
-    return Object.keys(competitors).map((k) => (
-      <b className="d-inline-block p-2" key={k}>
-        <div>{k}</div>
-        <div>{objHotel.competitors[k]}</div>
+    return lsCompetitor.map((o) => (
+      <b className="d-inline-block p-2" key={o.key}>
+        <div>{o.key}</div>
+        <div>{o.rateWithCurrency}</div>
       </b>
     ))
   }
