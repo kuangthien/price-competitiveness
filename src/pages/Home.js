@@ -21,14 +21,16 @@ const SearchTop = () => {
 }
 
 const HotelList = observer(() => {
-  const appContext = useContext(AppContext) // See the Timer definition above.
+  const { hotelStore } = useContext(AppContext) // See the Timer definition above.
 
-  const hotelStore = appContext.hotelStore
-  const hotels = hotelStore.hotels
+  const hotels = hotelStore.searchResults
 
   useEffect(() => {
     hotelStore.load()
   }, [hotelStore])
+  if (hotels.NO_RESULT) {
+    return null
+  }
   return (
     <div className="container">
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 ">
@@ -64,6 +66,7 @@ const HotelListItem = ({ hotel }) => {
         />
         <div className="card-body">
           <div className="fw-bold">{objHotel.name}</div>
+          <div>Price: {objHotel.priceWithCurrency}</div>
           <div>
             Stars: {objHotel.stars} - Rating: {objHotel.rating}
           </div>
